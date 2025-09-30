@@ -4,14 +4,11 @@ import os
 BUFFER_SIZE = 4096
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect(('127.0.0.1', 60001))
+client_socket.connect(('127.0.0.1', 60000))
 print("Conectado ao servidor", client_socket.getpeername())
 
-# 1) pedir o arquivo
-client_socket.sendall(b'baixar')
 
 def downloadArquivo(sock):
-    # 2) ler o header até '\n'
     header = b''
     while b'\n' not in header:
         chunk = sock.recv(BUFFER_SIZE)
@@ -42,7 +39,6 @@ def downloadArquivo(sock):
             f.write(rest)
             received += len(rest)
 
-        # continua recebendo até atingir filesize
         while received < filesize:
             to_read = min(BUFFER_SIZE, filesize - received)
             chunk = sock.recv(to_read)
@@ -50,12 +46,25 @@ def downloadArquivo(sock):
                 raise RuntimeError("Conexão fechada antes do fim do arquivo")
             f.write(chunk)
             received += len(chunk)
-            # opcional: mostrar progresso
-            # print(f"Recebidos {received}/{filesize} bytes", end='\r')
+            
+            print(f"Recebido: {int(received/filesize * 100)}%", end='\r')
 
-    print(f"[+] Arquivo recebido: {out_name} ({received} bytes)")
+while True and client_socket:
+    print("--------MENU--------")
+    print("1) Download UDP")
+    print("2) Download TCP")
+    print("3) Exit")
+    mode = input("Selecione uma opção: ")
 
-downloadArquivo(client_socket)
+    if (mode.find("1")):
+        client_socket.send(b"udp")
+        downloadArquivo(client_socket)
 
-print("Fechando conexão")
-client_socket.close()
+    if (mode.find("2")):
+        client_socket.send(b"tcp")
+        downloadArquivo(client_socket)
+
+    if (mode.find("3")):
+        client_socket.send(b"tcp")
+        print("Fechando conexão")
+        client_socket.close()
