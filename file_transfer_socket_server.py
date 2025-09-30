@@ -36,18 +36,16 @@ while True:
     try:
         # while True:
         data = connection.recv(1024)
-        print('Mensagem recebida:', data.decode())
-        # if data.decode() == 'sair':
-        #     break
+        if data.decode() == 'exit':
+            print("Encerrando conexão")
+            server_socket.close()
+            exit
         if data.decode() == 'udp':
             print("Iniciando transferência UDP")
             transferirArquivo(connection)
         if data.decode() == 'tcp':
             print("Iniciando transferência TCP")
             transferirArquivo(connection)
-        if data.decode() == 'exit':
-            print("Encerrando conexão")
-            server_socket.close()
         
     except:
         print("Ocorreu uma exceção!")

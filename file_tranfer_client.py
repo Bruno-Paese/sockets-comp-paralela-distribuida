@@ -56,15 +56,16 @@ while True and client_socket:
     print("3) Exit")
     mode = input("Selecione uma opção: ")
 
-    if (mode.find("1")):
+    if (mode.find("1") != -1):
         client_socket.send(b"udp")
         downloadArquivo(client_socket)
 
-    if (mode.find("2")):
+    if (mode.find("2") != -1):
         client_socket.send(b"tcp")
         downloadArquivo(client_socket)
 
-    if (mode.find("3")):
+    if (mode.find("3") != -1):
         client_socket.send(b"tcp")
         print("Fechando conexão")
         client_socket.close()
+        break;
