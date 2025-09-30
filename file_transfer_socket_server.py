@@ -2,11 +2,8 @@ import socket
 import time
 import os
 
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(('', 60000))
-server_socket.listen()
-
-FILE_NAME = '/home/bruno/Vídeos/VIDEO/180123000/131429AA.MP4'
+FILE_NAME = '/home/bruno/Vídeos/VIDEO/180123000/131429AB.MP4'
+FILE_NAME = './README.md'
 BUFFER_SIZE = 4096
 filesize = os.path.getsize(FILE_NAME)
 
@@ -26,28 +23,36 @@ def transferirArquivo(connection):
 
         endTime =  time.time();
         print(f"Arquivo {FILE_NAME} enviado com sucesso. Transferencia durou {endTime - startTime} segundos")
-    # connection.send(b"\\endfile", b'{endTime - startTime}')
+    connection.send(f'{endTime - startTime}'.encode())
 
-print('Aguardando conexão do cliente para iniciar transferência de arquivo')
-connection, client_address = server_socket.accept()
-print('Cliente conectado:', client_address)
+def menu():
+    print("--------MENU--------")
+    print("1) Start UDP")
+    print("2) Start TCP")
+    print("3) Exit")
+    mode = input("Selecione uma opção: ")
 
-while True: 
-    try:
+    if (mode.find("1") != -1):
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        server_socket.bind(('', 60000))
+        server_socket.listen()
+
+    if (mode.find("2") != -1):
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.bind(('', 60000))
+        server_socket.listen()
+
+    print('Aguardando conexão do cliente para iniciar transferência de arquivo')
+    connection, client_address = server_socket.accept()
+    print('Cliente conectado:', client_address)
+    # while True:
+    # try:
         # while True:
-        data = connection.recv(1024)
-        if data.decode() == 'exit':
-            print("Encerrando conexão")
-            server_socket.close()
-            exit
-        if data.decode() == 'udp':
-            print("Iniciando transferência UDP")
-            transferirArquivo(connection)
-        if data.decode() == 'tcp':
-            print("Iniciando transferência TCP")
-            transferirArquivo(connection)
-        
-    except:
-        print("Ocorreu uma exceção!")
-        server_socket.close()
-        break
+    transferirArquivo(connection)
+            
+    # except:
+    #     print("Ocorreu uma exceção!")
+    #     server_socket.close()
+
+
+connection = menu()

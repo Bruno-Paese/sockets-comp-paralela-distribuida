@@ -45,27 +45,13 @@ def downloadArquivo(sock):
             if not chunk:
                 raise RuntimeError("Conexão fechada antes do fim do arquivo")
             f.write(chunk)
+            print(chunk);
             received += len(chunk)
             
             print(f"Recebido: {int(received/filesize * 100)}%", end='\r')
+        f.close()
+        timeToExecute = sock.recv(BUFFER_SIZE)
+        print(f"Execução durou {timeToExecute.decode()} segundos");
 
-while True and client_socket:
-    print("--------MENU--------")
-    print("1) Download UDP")
-    print("2) Download TCP")
-    print("3) Exit")
-    mode = input("Selecione uma opção: ")
-
-    if (mode.find("1") != -1):
-        client_socket.send(b"udp")
-        downloadArquivo(client_socket)
-
-    if (mode.find("2") != -1):
-        client_socket.send(b"tcp")
-        downloadArquivo(client_socket)
-
-    if (mode.find("3") != -1):
-        client_socket.send(b"tcp")
-        print("Fechando conexão")
-        client_socket.close()
-        break;
+downloadArquivo(client_socket)
+client_socket.close()
