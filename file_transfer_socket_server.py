@@ -3,11 +3,10 @@ import time
 import os
 
 FILE_NAME = '/home/bruno/Vídeos/VIDEO/180123000/131429AB.MP4'
-FILE_NAME = './README.md'
-BUFFER_SIZE = 4096
+BUFFER_SIZE = 512
 filesize = os.path.getsize(FILE_NAME)
 
-def transferirArquivo(connection):
+def transferirArquivo(connection, buffer_size):
     print(f"Iniciando transferência de arquivo {time.time()}")
     connection.send(f"{os.path.basename(FILE_NAME)};{filesize}\n".encode())
     startTime = time.time();
@@ -15,14 +14,13 @@ def transferirArquivo(connection):
     with open(FILE_NAME, "rb") as f:
         size = 0
         while size < filesize:
-            bytes_read = f.read(BUFFER_SIZE)
+            bytes_read = f.read(buffer_size)
             if not bytes_read:
                 break
             connection.send(bytes_read)
             size += len(bytes_read)
 
         endTime =  time.time();
-        print(f"Arquivo {FILE_NAME} enviado com sucesso. Transferencia durou {endTime - startTime} segundos")
     connection.send(f'{endTime - startTime}'.encode())
 
 def menu():
@@ -45,14 +43,13 @@ def menu():
     print('Aguardando conexão do cliente para iniciar transferência de arquivo')
     connection, client_address = server_socket.accept()
     print('Cliente conectado:', client_address)
-    # while True:
-    # try:
-        # while True:
-    transferirArquivo(connection)
-            
-    # except:
-    #     print("Ocorreu uma exceção!")
-    #     server_socket.close()
+    while True:
+        try:
+            buffer_size = connection.recv(100);
+            transferirArquivo(connection, int(buffer_size.decode()))
+
+        except:
+            server_socket.close()
 
 
-connection = menu()
+menu()
