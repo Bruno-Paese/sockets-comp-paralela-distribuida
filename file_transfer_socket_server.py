@@ -2,11 +2,11 @@ import socket
 import time
 import os
 
-FILE_NAME = '/home/bruno/Vídeos/VIDEO/180123000/131429AB.MP4'
+FILE_NAME = './video.mp4'
 BUFFER_SIZE = 512
 filesize = os.path.getsize(FILE_NAME)
 
-def transferirArquivo(connection, buffer_size):
+def transferirArquivoPorTcp(connection):
     print(f"Iniciando transferência de arquivo {time.time()}")
     connection.send(f"{os.path.basename(FILE_NAME)};{filesize}\n".encode())
     startTime = time.time();
@@ -14,7 +14,7 @@ def transferirArquivo(connection, buffer_size):
     with open(FILE_NAME, "rb") as f:
         size = 0
         while size < filesize:
-            bytes_read = f.read(buffer_size)
+            bytes_read = f.read(BUFFER_SIZE)
             if not bytes_read:
                 break
             connection.send(bytes_read)
@@ -22,6 +22,23 @@ def transferirArquivo(connection, buffer_size):
 
         endTime =  time.time();
     connection.send(f'{endTime - startTime}'.encode())
+
+def transferirArquivoPorUdp(socket, client_address):
+    print(f"Iniciando transferência de arquivo {time.time()}")
+    socket.sendto(f"{os.path.basename(FILE_NAME)};{filesize}\n".encode())
+    startTime = time.time();
+    print (f"Tamanho do arquivo: {filesize}")
+    with open(FILE_NAME, "rb") as f:
+        size = 0
+        while size < filesize:
+            bytes_read = f.read(BUFFER_SIZE)
+            if not bytes_read:
+                break
+            socket.sendto(bytes_read, client_address)
+            size += len(bytes_read)
+
+        endTime =  time.time();
+    socket.sendto(f'{endTime - startTime}'.encode())
 
 def menu():
     print("--------MENU--------")
@@ -33,7 +50,7 @@ def menu():
     if (mode.find("1") != -1):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         server_socket.bind(('', 60000))
-        server_socket.listen()
+
 
     if (mode.find("2") != -1):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,12 +58,19 @@ def menu():
         server_socket.listen()
 
     print('Aguardando conexão do cliente para iniciar transferência de arquivo')
-    connection, client_address = server_socket.accept()
-    print('Cliente conectado:', client_address)
+    
+    
     while True:
         try:
-            buffer_size = connection.recv(100);
-            transferirArquivo(connection, int(buffer_size.decode()))
+            if (mode.find("1") != -1):
+                client_address = server_socket.recvfrom(100)
+                transferirArquivoPorUdp(server_socket, client_address)
+            
+            if (mode.find("2") != -1):
+                connection, client_address = server_socket.accept()
+                print('Cliente conectado:', client_address)
+                transferirArquivoPorTcp(connection)
+                server_socket.close()
 
         except:
             server_socket.close()
