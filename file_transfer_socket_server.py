@@ -44,7 +44,7 @@ def transferirArquivoPorUdp(sock, client_address):
         print(f"Enviado: {int(size/filesize * 100)}%")
         endTime =  time.time();
     print (f"Arquivo transferido")
-    # sock.sendto(f'{endTime - startTime}'.encode(), client_address)
+    sock.sendto(f'{endTime - startTime}'.encode(), client_address)
 
 def menu():
     print("--------MENU--------")
