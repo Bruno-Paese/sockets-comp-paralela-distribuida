@@ -2,8 +2,8 @@ import socket
 import time
 import os
 
-FILE_NAME = './README.md'
-BUFFER_SIZE = 512
+FILE_NAME = './video.mp4'
+BUFFER_SIZE = 4096
 filesize = os.path.getsize(FILE_NAME)
 
 def transferirArquivoPorTcp(connection):
@@ -19,8 +19,10 @@ def transferirArquivoPorTcp(connection):
                 break
             connection.send(bytes_read)
             size += len(bytes_read)
-
+            print(f"Enviado: {int(size/filesize * 100)}%", end='\r')
+        print(f"Enviado: {int(size/filesize * 100)}%")
         endTime =  time.time();
+    print (f"Arquivo transferido")
     connection.send(f'{endTime - startTime}'.encode())
 
 def transferirArquivoPorUdp(sock, client_address):
@@ -33,18 +35,21 @@ def transferirArquivoPorUdp(sock, client_address):
         while size < filesize:
             bytes_read = f.read(BUFFER_SIZE)
             if not bytes_read:
+                print("break")
                 break
             sock.sendto(bytes_read, client_address)
             size += len(bytes_read)
-
+            print(f"Enviado: {int(size/filesize * 100)}%", end='\r')
+           
+        print(f"Enviado: {int(size/filesize * 100)}%")
         endTime =  time.time();
-    sock.sendto(f'{endTime - startTime}'.encode(), client_address)
+    print (f"Arquivo transferido")
+    # sock.sendto(f'{endTime - startTime}'.encode(), client_address)
 
 def menu():
     print("--------MENU--------")
     print("1) Start UDP")
     print("2) Start TCP")
-    print("3) Exit")
     mode = input("Selecione uma opção: ")
 
     if (mode.find("1") != -1):

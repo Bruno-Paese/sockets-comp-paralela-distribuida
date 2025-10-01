@@ -1,7 +1,7 @@
 import socket
 import os
 
-BUFFER_SIZE = 512
+BUFFER_SIZE = 4096
 SERVER_ADDR = ('127.0.0.1', 60000)
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -27,30 +27,19 @@ def downloadArquivo(sock, BUFFER_SIZE):
         received = 0
         while received < filesize:
             to_read = min(BUFFER_SIZE, filesize - received)
-            chunk, _ = sock.recvfrom(to_read + 64)  # UDP might merge or split differently
+            chunk, _ = sock.recvfrom(to_read + 64)
             if not chunk:
                 raise RuntimeError("Socket fechado antes do fim do arquivo")
             f.write(chunk)
             received += len(chunk)
             print(f"Recebido: {int(received/filesize * 100)}%", end='\r')
-
-        # espera mensagem de tempo de execução
         timeToExecute, _ = sock.recvfrom(BUFFER_SIZE)
         print(f"\nExecução durou {timeToExecute.decode()} segundos")
 
     return float(timeToExecute.decode())
 
-times = [0] * 25
-runsForAverage = 10  # reduzido para não sobrecarregar UDP
+tte = downloadArquivo(client_socket, BUFFER_SIZE)
 
-for k in range(1, 25):
-    times[k] = 0
-    for i in range(1, runsForAverage):
-        tte = downloadArquivo(client_socket, BUFFER_SIZE * k)
-        times[k] += tte
-    times[k] = times[k] / runsForAverage
-        
-for k in range(1, 25):
-    print(f"Média para buffer de {BUFFER_SIZE * k}: {times[k]}")
+print(f"Tempo para buffer de {BUFFER_SIZE}: {tte}")
 
 client_socket.close()
