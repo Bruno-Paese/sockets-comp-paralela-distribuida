@@ -2,7 +2,7 @@ import socket
 import time
 import os
 
-FILE_NAME = './video.mp4'
+FILE_NAME = './README.md'
 BUFFER_SIZE = 512
 filesize = os.path.getsize(FILE_NAME)
 
@@ -23,9 +23,9 @@ def transferirArquivoPorTcp(connection):
         endTime =  time.time();
     connection.send(f'{endTime - startTime}'.encode())
 
-def transferirArquivoPorUdp(socket, client_address):
+def transferirArquivoPorUdp(sock, client_address):
     print(f"Iniciando transferência de arquivo {time.time()}")
-    socket.sendto(f"{os.path.basename(FILE_NAME)};{filesize}\n".encode())
+    sock.sendto(f"{os.path.basename(FILE_NAME)};{filesize}\n".encode(), client_address)
     startTime = time.time();
     print (f"Tamanho do arquivo: {filesize}")
     with open(FILE_NAME, "rb") as f:
@@ -34,11 +34,11 @@ def transferirArquivoPorUdp(socket, client_address):
             bytes_read = f.read(BUFFER_SIZE)
             if not bytes_read:
                 break
-            socket.sendto(bytes_read, client_address)
+            sock.sendto(bytes_read, client_address)
             size += len(bytes_read)
 
         endTime =  time.time();
-    socket.sendto(f'{endTime - startTime}'.encode())
+    sock.sendto(f'{endTime - startTime}'.encode(), client_address)
 
 def menu():
     print("--------MENU--------")
@@ -58,12 +58,12 @@ def menu():
 
     print('Aguardando conexão do cliente para iniciar transferência de arquivo')
 
-
     while True:
         try:
             if (mode.find("1") != -1):
-                client_address = server_socket.recvfrom(100)
+                data, client_address = server_socket.recvfrom(100)
                 transferirArquivoPorUdp(server_socket, client_address)
+
             
             if (mode.find("2") != -1):
                 connection, client_address = server_socket.accept()
