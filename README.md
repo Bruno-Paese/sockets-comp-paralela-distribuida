@@ -12,7 +12,7 @@ Essa decisão foi tomada por ser um tamanho comum de bloco em discos rígidos e 
 
 ## Resultados
 
-Fazendo a transferência de um computador para outro, o UPD teve o seguinte resultado
+Fazendo a transferência de um computador para outro em uma mesma rede, o UPD teve o seguinte resultado
 
 ```
 [*] Recebendo ./downloaded_video.mp4 (17839845 bytes)
