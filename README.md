@@ -5,7 +5,7 @@
 # Decisões técnicas do projeto
 
 ## Uso do buffer de 512B
-Essa decisão foi tomada por ser um tamanho comum de bloco em discos rígidos e SSDs. A partir disso foi implementada uma rotina no protocolo de conexão do socket para a requisição de um tamanho de buffer arbitrário. Para que o tempo de transferência pudesse ser determinada foram realizadas 20 execuções para cada tempo e o tamanho inicial de buffer. A partir disso foram obtidos os seuguintes resultados, utilizando um ambiente em uma máquina única:
+Essa decisão foi tomada por ser um tamanho comum de bloco em discos rígidos e SSDs. A partir disso foi implementada uma rotina no protocolo de conexão do socket para a requisição de um tamanho de buffer arbitrário. Para que o tempo de transferência pudesse ser determinada foram realizadas 20 execuções para cada tempo e o tamanho inicial de buffer. A partir disso foram obtidos os seuguintes resultados:
 
 Média para buffer de 512: 2.1901411652565
 Média para buffer de 1024: 1.3032003879547118

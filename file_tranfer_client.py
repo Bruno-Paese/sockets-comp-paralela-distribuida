@@ -55,17 +55,17 @@ def downloadArquivo(sock, BUFFER_SIZE):
         print(f"Execução durou {timeToExecute.decode()} segundos");
     return float(timeToExecute.decode())
 
-times = [0] * 25
-runsForAverage = 100
+times = [0] * 30
+runsForAverage = 20
 
-for k in range(1, 25):
+for k in range(1, 30):
     times[k] = 0
     for i in range(1, runsForAverage):
         tte = downloadArquivo(client_socket, BUFFER_SIZE * k)
         times[k] = times[k] + tte
     times[k] = times[k]/runsForAverage
         
-for k in range(1, 25):
+for k in range(1, 30):
     print(f"Média para buffer de {BUFFER_SIZE * k}: {times[k]}")
 
 client_socket.close()
